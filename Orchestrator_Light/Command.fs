@@ -2,7 +2,9 @@
 
 open System.Diagnostics
 
-let Exec command options callback = 
+let ENCODING_GERMAN = System.Text.Encoding.GetEncoding(437)
+
+let Exec command options update = 
     let psi = new ProcessStartInfo(command, options)
     let proc = new Process(StartInfo = psi, EnableRaisingEvents = true)
 
@@ -10,10 +12,12 @@ let Exec command options callback =
     psi.RedirectStandardOutput <- true
     psi.RedirectStandardError <- true 
     psi.CreateNoWindow <- true
-    psi.StandardOutputEncoding <- System.Text.Encoding.GetEncoding(437)
+    psi.StandardOutputEncoding <- ENCODING_GERMAN
     
-    proc.OutputDataReceived.Add(callback)
+    proc.OutputDataReceived.Add update
     proc.Start() |> ignore
     proc.BeginOutputReadLine()
     proc.BeginErrorReadLine()
     proc.WaitForExit()
+
+let ExecString command update = Exec "cmd" ("/C " + command) update
